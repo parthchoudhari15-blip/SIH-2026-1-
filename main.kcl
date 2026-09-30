@@ -1,0 +1,15 @@
+// Master frame public part library
+// Separate manufactured parts and dimensional families.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+export import machineLength, machineWidth, machineHeight, frameProfile, cableCenterHeight, minCableDiameter, maxCableDiameter, cableCenterY, deckHeight, tubeWall, rearServiceClearance, stationX from "parameters.kcl"
+export import plateBlank from "plateBlank.kcl"
+export import roundBlank from "roundBlank.kcl"
+export import hollowMember from "hollowMember.kcl"
+export import column as columnPart from "column.kcl"
+export import longitudinalRail as longitudinalPart from "longitudinalRail.kcl"
+export import transverseRail as transversePart from "transverseRail.kcl"
+export import upperRail as upperPart from "upperRail.kcl"
+export import mountingPlate as interfacePart from "mountingPlate.kcl"
+export import gusset as gussetPart from "gusset.kcl"
+export import entryPanel as entryPanelPart from "entryPanel.kcl"
+export import doorFrame as doorFramePart, doorWidth, doorHeight from "doorFrame.kcl"

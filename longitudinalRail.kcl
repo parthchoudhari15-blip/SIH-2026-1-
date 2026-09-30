@@ -1,0 +1,13 @@
+// Longitudinal frame rail
+// Hollow member between the four main columns.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+
+import hollowMember from "hollowMember.kcl"
+import machineLength, frameProfile, tubeWall from "parameters.kcl"
+export longitudinalRail = hollowMember(
+  width = frameProfile,
+  depth = frameProfile,
+  wall = tubeWall,
+  length = machineLength - (2 * frameProfile),
+)
+  |> appearance(color = "#778690", metalness = 65, roughness = 35)

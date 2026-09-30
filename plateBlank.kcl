@@ -1,0 +1,26 @@
+// Rectangular plate family
+// Centered solver-driven blanks for panels and fabricated plates.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+export fn plateBlank(width, depth, thickness) {
+  plateProfile = sketch(on = XY) {
+    bottom = line(start = [var -20mm, var -20mm], end = [var 20mm, var -20mm])
+    right = line(start = [var 20mm, var -20mm], end = [var 20mm, var 20mm])
+    top = line(start = [var 20mm, var 20mm], end = [var -20mm, var 20mm])
+    left = line(start = [var -20mm, var 20mm], end = [var -20mm, var -20mm])
+    coincident([bottom.end, right.start])
+    coincident([right.end, top.start])
+    coincident([top.end, left.start])
+    coincident([left.end, bottom.start])
+    horizontal(bottom)
+    vertical(right)
+    horizontal(top)
+    vertical(left)
+    horizontalDistance([ORIGIN, bottom.start]) == -width / 2
+    verticalDistance([ORIGIN, bottom.start]) == -depth / 2
+    distance([bottom.start, bottom.end]) == width
+    distance([right.start, right.end]) == depth
+  }
+  plateBody = extrude(region(segments = [plateProfile.bottom, plateProfile.right], intersectionIndex = -1, direction = CCW), length = thickness, symmetric = true)
+  hide(plateProfile)
+  return plateBody
+}

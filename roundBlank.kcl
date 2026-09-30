@@ -1,0 +1,14 @@
+// Circular hardware family
+// Centered disks and shanks with solver-controlled diameters.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+export fn roundBlank(outerDiameter, length) {
+  roundProfile = sketch(on = XY) {
+    perimeter = circle(center = [var 0mm, var 0mm], start = [var 10mm, var 0mm])
+    coincident([perimeter.center, ORIGIN])
+    radius(perimeter) == outerDiameter / 2
+    horizontal([perimeter.center, perimeter.start])
+  }
+  roundBody = extrude(region(segments = [roundProfile.perimeter]), length = length, symmetric = true)
+  hide(roundProfile)
+  return roundBody
+}

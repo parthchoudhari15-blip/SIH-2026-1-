@@ -1,0 +1,15 @@
+// SIH 26030 master dimensions
+// Frame datum and future station coordinates; do not relocate accepted interfaces.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+export machineLength = 2000mm
+export machineWidth = 800mm
+export machineHeight = 1700mm
+export frameProfile = 40mm
+export cableCenterHeight = 900mm
+export minCableDiameter = 5mm
+export maxCableDiameter = 40mm
+export cableCenterY = 300mm
+export deckHeight = 750mm
+export tubeWall = 3mm
+export rearServiceClearance = 350mm
+export stationX = [130mm, 290mm, 480mm, 650mm, 790mm, 950mm, 1130mm, 1300mm, 1510mm, 1710mm, 1850mm]

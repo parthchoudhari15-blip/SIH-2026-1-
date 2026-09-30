@@ -1,0 +1,31 @@
+// Future module mounting plate
+// Four through-holes on a common 90 by 280 mm interface.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+
+import plateBlank from "plateBlank.kcl"
+import roundBlank from "roundBlank.kcl"
+plateWidth = 120mm
+plateDepth = 360mm
+plateThickness = 8mm
+holeDiameter = 9mm
+holePitchX = 90mm
+holePitchY = 280mm
+plateStock = plateBlank(width = plateWidth, depth = plateDepth, thickness = plateThickness)
+holeFrontLeft = roundBlank(outerDiameter = holeDiameter, length = plateThickness + 2mm)
+  |> translate(x = -holePitchX / 2, y = -holePitchY / 2, global = true)
+holeFrontRight = clone(holeFrontLeft)
+  |> translate(x = holePitchX, global = true)
+holeRearLeft = clone(holeFrontLeft)
+  |> translate(y = holePitchY, global = true)
+holeRearRight = clone(holeFrontLeft)
+  |> translate(x = holePitchX, y = holePitchY, global = true)
+export mountingPlate = subtract(
+  [plateStock],
+  tools = [
+    holeFrontLeft,
+    holeFrontRight,
+    holeRearLeft,
+    holeRearRight
+  ],
+)
+  |> appearance(color = "#458D9C", metalness = 50, roughness = 35)

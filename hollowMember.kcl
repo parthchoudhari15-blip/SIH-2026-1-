@@ -1,0 +1,10 @@
+// Rectangular hollow member family
+// Explicit through-void for frame tubes and enclosure surrounds.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+import plateBlank from "plateBlank.kcl"
+export fn hollowMember(width, depth, wall, length) {
+  outerBlank = plateBlank(width = width, depth = depth, thickness = length)
+  innerTool = plateBlank(width = width - 2 * wall, depth = depth - 2 * wall, thickness = length + 2mm)
+  hollowBody = subtract([outerBlank], tools = [innerTool])
+  return hollowBody
+}

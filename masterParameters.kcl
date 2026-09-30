@@ -1,0 +1,4 @@
+// Master parameter public interface
+// Edit the authoritative dimensions in parts/parameters.kcl.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+export import machineLength, machineWidth, machineHeight, frameProfile, cableCenterHeight, minCableDiameter, maxCableDiameter, cableCenterY, deckHeight, tubeWall, rearServiceClearance, stationX from "parts/main.kcl"

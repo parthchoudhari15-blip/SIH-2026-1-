@@ -1,0 +1,13 @@
+// Upper longitudinal cap rail
+// Full-length hollow rail defines the 1700 mm upper envelope.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+
+import hollowMember from "hollowMember.kcl"
+import machineLength, frameProfile, tubeWall from "parameters.kcl"
+export upperRail = hollowMember(
+  width = frameProfile,
+  depth = frameProfile,
+  wall = tubeWall,
+  length = machineLength,
+)
+  |> appearance(color = "#778690", metalness = 65, roughness = 35)

@@ -1,0 +1,14 @@
+// Cable-entry enclosure panel
+// Six-millimeter polycarbonate with a provisional 60 mm feed aperture.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+
+import plateBlank from "plateBlank.kcl"
+import roundBlank from "roundBlank.kcl"
+import machineWidth, machineHeight, frameProfile, deckHeight, cableCenterY, cableCenterHeight from "parameters.kcl"
+panelHeight = machineHeight - frameProfile - deckHeight
+panelWidth = machineWidth - (2 * frameProfile)
+panelStock = plateBlank(width = panelWidth, depth = panelHeight, thickness = 6mm)
+entryTool = roundBlank(outerDiameter = 60mm, length = 8mm)
+  |> translate(x = cableCenterY - (machineWidth / 2), y = cableCenterHeight - deckHeight - (panelHeight / 2), global = true)
+export entryPanel = subtract([panelStock], tools = [entryTool])
+  |> appearance(color = "#95D6E2", opacity = 16, roughness = 15)

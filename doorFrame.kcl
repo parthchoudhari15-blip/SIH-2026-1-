@@ -1,0 +1,15 @@
+// Front access door surround
+// Continuous pierced surround with a replaceable transparent infill.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+
+import hollowMember from "hollowMember.kcl"
+import machineLength, frameProfile from "parameters.kcl"
+export doorWidth = (machineLength - (2 * frameProfile) - 16mm) / 2
+export doorHeight = 900mm
+export doorFrame = hollowMember(
+  width = doorWidth,
+  depth = doorHeight,
+  wall = 25mm,
+  length = 24mm,
+)
+  |> appearance(color = "#374650", metalness = 45, roughness = 35)

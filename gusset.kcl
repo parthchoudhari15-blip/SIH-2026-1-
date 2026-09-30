@@ -1,0 +1,42 @@
+// Frame corner gusset
+// Pierced triangular joint plate; centered local fabrication geometry.
+@settings(defaultLengthUnit = mm, kclVersion = 2.0)
+
+import roundBlank from "roundBlank.kcl"
+gussetSize = 100mm
+gussetThickness = 6mm
+gussetProfile = sketch(on = XY) {
+  bottom = line(start = [var -50mm, var -50mm], end = [var 50mm, var -50mm])
+  diagonal = line(start = [var 50mm, var -50mm], end = [var -50mm, var 50mm])
+  left = line(start = [var -50mm, var 50mm], end = [var -50mm, var -50mm])
+  coincident([bottom.end, diagonal.start])
+  coincident([diagonal.end, left.start])
+  coincident([left.end, bottom.start])
+  horizontal(bottom)
+  vertical(left)
+  horizontalDistance([ORIGIN, bottom.start]) == -gussetSize / 2
+  verticalDistance([ORIGIN, bottom.start]) == -gussetSize / 2
+  distance([bottom.start, bottom.end]) == gussetSize
+  equalLength([bottom, left])
+}
+gussetStock = extrude(
+  region(
+    segments = [
+      gussetProfile.bottom,
+      gussetProfile.diagonal
+    ],
+    intersectionIndex = -1,
+    direction = CCW,
+  ),
+  length = gussetThickness,
+  symmetric = true,
+)
+hide(gussetProfile)
+holeRoot = roundBlank(outerDiameter = 9mm, length = 8mm)
+  |> translate(x = -30mm, y = -30mm, global = true)
+holeHorizontal = clone(holeRoot)
+  |> translate(x = 50mm, global = true)
+holeVertical = clone(holeRoot)
+  |> translate(y = 50mm, global = true)
+export gusset = subtract([gussetStock], tools = [holeRoot, holeHorizontal, holeVertical])
+  |> appearance(color = "#D6DDE1", metalness = 65)

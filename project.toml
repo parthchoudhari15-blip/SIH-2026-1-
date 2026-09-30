@@ -1,0 +1,13 @@
+title = "demo-project-4"
+default_file = "main.kcl"
+
+[settings.app]
+[settings.meta]
+id = "38d489b5-84db-4baf-94ea-17e9e9c66964"
+
+[settings.modeling]
+[cloud."zoo.dev"]
+project_id = "680a82d8-881d-418f-8474-b12e27a5b73d"
+
+[zookeeper."zoo.dev"]
+conversation_ids = [ "e54e5453-cbe3-442e-91fb-5c5f295e7b2f" ]
