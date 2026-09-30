@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SIH 26030 — Current CAD 3D Viewer</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#11161a;color:#eef2f5}
+#ui{position:absolute;z-index:5;left:16px;top:16px;background:rgba(18,23,27,.9);padding:16px 18px;border:1px solid #3b454d;border-radius:10px;max-width:330px;box-shadow:0 8px 30px #0008}
+h1{font-size:18px;margin:0 0 8px}p{font-size:12px;line-height:1.45;color:#bfc8ce;margin:6px 0 12px}.row{display:flex;gap:6px;flex-wrap:wrap}button{background:#263039;color:#eef2f5;border:1px solid #4b5963;border-radius:6px;padding:7px 9px;cursor:pointer}button:hover{background:#33414b}label{display:block;font-size:12px;margin:8px 0;color:#d5dde2}input{vertical-align:middle}.legend{margin-top:10px;font-size:11px;color:#aeb8bf}.warn{color:#ffd58a}.tag{position:absolute;z-index:4;pointer-events:none;color:#eaf0f4;font-size:11px;background:#182027cc;border:1px solid #45525b;padding:3px 5px;border-radius:4px;display:none}
+</style>
+</head>
+<body>
+<div id="ui">
+<h1>SIH 26030 — Current CAD 3D Viewer</h1>
+<p>Interactive browser visualization reconstructed from the uploaded BuildCAD/KCL frame assembly and its master parameters.</p>
+<div class="row"><button id="iso">Isometric</button><button id="front">Front</button><button id="top">Top</button><button id="reset">Reset</button></div>
+<label><input id="enclosure" type="checkbox" checked> Show safety enclosure</label>
+<label><input id="stations" type="checkbox" checked> Show processing station interfaces</label>
+<label><input id="cable" type="checkbox" checked> Show cable datum</label>
+<div class="legend">Frame: 2000 × 800 × 1700 mm · profile 40 mm · deck 750 mm · cable centerline Z≈900 mm · cable range 5–40 mm OD.</div>
+<p class="warn">Current CAD scope: frame, deck, enclosure/interface placeholders and cable datum. Processing mechanisms are intentionally absent in the supplied KCL project.</p>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x11161a);
+const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,10000);
+const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); document.body.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement); controls.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xddeeff,0x394149,2.1)); const dl=new THREE.DirectionalLight(0xffffff,2.0); dl.position.set(3,5,4); scene.add(dl);
+const root=new THREE.Group(); scene.add(root);
+const frameMat=new THREE.MeshStandardMaterial({color:0x56636c,metalness:.65,roughness:.3});
+const darkMat=new THREE.MeshStandardMaterial({color:0x242b30,metalness:.6,roughness:.35});
+const deckMat=new THREE.MeshStandardMaterial({color:0xaeb9c0,metalness:.5,roughness:.42});
+const clearMat=new THREE.MeshPhysicalMaterial({color:0x72a9bd,transparent:true,opacity:.10,roughness:.15,metalness:.05,side:THREE.DoubleSide});
+const stationMat=new THREE.MeshStandardMaterial({color:0xd18b36,metalness:.35,roughness:.4});
+const cableMat=new THREE.MeshStandardMaterial({color:0x111111,roughness:.65});
+function box(x,y,z,px,py,pz,mat=frameMat,parent=root){let g=new THREE.BoxGeometry(x,y,z);let m=new THREE.Mesh(g,mat);m.position.set(px,py,pz);parent.add(m);return m}
+function cyl(r,h,px,py,pz,mat=darkMat,parent=root,rot=null){let m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,32),mat);m.position.set(px,py,pz);if(rot)m.rotation.set(...rot);parent.add(m);return m}
+// scale: 1 unit = 100 mm
+const S=0.01; const L=2000*S,W=800*S,H=1700*S,P=40*S,deck=750*S,cableZ=900*S,cableY=300*S;
+// columns
+for(const x of [P/2,L-P/2])for(const y of [P/2,W-P/2])box(P,P,H,x,y,H/2);
+// horizontal rails at base, work, upper
+for(const z of [100*S,deck-130*S,H-P/2]){box(L-2*P,P,P,L/2,P/2,z);box(L-2*P,P,P,L/2,W-P/2,z);box(P,W-2*P,P,P/2,W/2,z);box(P,W-2*P,P,L-P/2,W/2,z)}
+// work cross members
+for(const x of [520*S,1020*S,1520*S])box(P,W-2*P,P,x,W/2,deck-130*S);
+// deck
+box(L-2*P,W-2*P,10*S,L/2,W/2,deck-5*S,deckMat);
+// feet
+for(const x of [P/2,L-P/2])for(const y of [P/2,W-P/2]){cyl(20*S,8*S,x,y,4*S);cyl(8*S,24*S,x,y,20*S)}
+// rear diagonal braces (approximate visual representation)
+function brace(x1,y1,z1,x2,y2,z2){let a=new THREE.Vector3(x1,y1,z1),b=new THREE.Vector3(x2,y2,z2),d=b.clone().sub(a),mid=a.clone().add(b).multiplyScalar(.5);let m=box(0.03,0.06,d.length(),mid.x,mid.y,mid.z,new THREE.MeshStandardMaterial({color:0x667e8b,metalness:.65}));m.rotation.setFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),d.normalize()));}
+brace(P,W-37*S,120*S,L-P,W-37*S,deck-50*S); brace(L-P,W-37*S,120*S,P,W-37*S,deck-50*S);
+// enclosure panels as thin transparent planes
+const enclosure=new THREE.Group(); root.add(enclosure);
+box(L,4*S,H-2*P, L/2, W+2*S, H/2, clearMat,enclosure); // rear
+box(L,4*S,H-2*P, L/2, -2*S, H/2, clearMat,enclosure); // front
+box(4*S,W,H-2*P, -2*S, W/2,H/2,clearMat,enclosure); box(4*S,W,H-2*P,L+2*S,W/2,H/2,clearMat,enclosure);
+// front door frame-ish outline
+for(const z of [100*S,H-100*S])box(8*S,8*S,8*S,L/2, -5*S,z,darkMat,enclosure);
+// cable datum along X, represented at 900 mm height, y=300
+const cable=new THREE.Mesh(new THREE.CylinderGeometry(5*S,5*S,(L-80*S),24),cableMat); cable.rotation.z=Math.PI/2; cable.position.set(L/2,cableY,cableZ); root.add(cable);
+// stations at exact KCL X positions
+const xs=[130,290,480,650,790,950,1130,1300,1510,1710,1850];
+const names=['Reel / Pay-off','Feed','Straightener','Diameter Sensor','Clamp','Circumferential Cut','Longitudinal Strip','Transfer','Dumbbell Punch','Ejection','Vision'];
+const stationGroup=new THREE.Group();root.add(stationGroup);
+xs.forEach((mm,i)=>{let x=mm*S; box(45*S,90*S,90*S,x,cableY,cableZ,stationMat,stationGroup); box(55*S,8*S,8*S,x,cableY,cableZ+55*S,stationMat,stationGroup);});
+// station labels via sprites
+function label(text,pos){const c=document.createElement('canvas'),ctx=c.getContext('2d');ctx.font='bold 22px Arial';let w=ctx.measureText(text).width+18;c.width=w;c.height=34;ctx.font='bold 22px Arial';ctx.fillStyle='#f2f5f7';ctx.fillText(text,9,24);const tex=new THREE.CanvasTexture(c);const mat=new THREE.SpriteMaterial({map:tex,transparent:true});const sp=new THREE.Sprite(mat);sp.position.copy(pos);sp.scale.set(w/400,.085,1);root.add(sp);return sp}
+xs.forEach((mm,i)=>label((i+1)+'. '+names[i],new THREE.Vector3(mm*S,cableY,cableZ+105*S)));
+// Ground
+box(L*1.15,W*1.15,10*S,L/2,W/2,-5*S,new THREE.MeshStandardMaterial({color:0x20272c,roughness:.9}));
+// axes helper
+scene.add(new THREE.GridHelper(26,26,0x3b464e,0x263038));
+function fit(){const target=new THREE.Vector3(L/2,W/2,H/2);controls.target.copy(target);camera.position.set(3.0,2.25,3.2);camera.lookAt(target);controls.update();}
+fit();
+function view(type){const t=new THREE.Vector3(L/2,W/2,H/2);controls.target.copy(t); if(type==='front')camera.position.set(L/2,-3.6,H/2);else if(type==='top')camera.position.set(L/2,W/2,4.4);else camera.position.set(3.0,2.25,3.2);camera.lookAt(t);controls.update()}
+document.getElementById('iso').onclick=()=>view('iso');document.getElementById('front').onclick=()=>view('front');document.getElementById('top').onclick=()=>view('top');document.getElementById('reset').onclick=fit;
+document.getElementById('enclosure').onchange=e=>enclosure.visible=e.target.checked;document.getElementById('stations').onchange=e=>stationGroup.visible=e.target.checked;document.getElementById('cable').onchange=e=>cable.visible=e.target.checked;
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+(function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)})();
+</script></body></html>
